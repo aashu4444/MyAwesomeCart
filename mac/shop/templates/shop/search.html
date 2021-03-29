@@ -1,0 +1,79 @@
+{% extends 'shop/basic.html' %}
+
+{% block title %}Search Results{% endblock title %}
+
+{% block body %}
+
+{% load static %}
+{% for product, range, nSlides in allProds %}
+<div class="card mx-4 my-4">
+  <h5 class="card-header">{{product.0.category}}</h5>
+  <div class="card-body">
+      <div id="carouselExampleDark{{forloop.counter}}" class="carousel carousel-dark slide my-5" data-bs-ride="carousel">
+  <div class="carousel-indicators" style="bottom:-15%;">
+    {% for i in range %}
+      <button type="button" data-bs-target="#carouselExampleDark{{forloop.parentloop.counter}}" data-bs-slide-to="{{i}}" class="{% if forloop.counter == 1 %}active{% endif %}" aria-current="true" aria-label="Slide {{i}}"></button>
+    {% endfor %}
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active" data-bs-interval="10000">
+        <div class="container d-flex justify-content-center">
+          {% for product in product %}
+            <div class="card ms-5" style="width: 18rem; height:432px;">
+              <img src="/media/{{product.image}}" class="card-img-top h-50" alt="...">
+              <div class="card-body h-25">
+                <h5 class="card-title product-title" data-name="{{product.product_name}}" id="namepr{{product.id}}">{{product.product_name}}</h5>
+                <p class="card-text">{{product.desc}}</p>
+                <p class="card-title fw-bold">Price : <span id="pricepr{{product.id}}">{{product.price}}</span></p>
+                <span id="divpr{{product.id}}" class="divpr">
+                  <button id="pr{{product.id}}" class="btn cart btn-primary">Add To Cart</button>
+                </span>
+                <a href="/shop/products/{{product.id}}" id="qv{{product.id}}" class="btn cart btn-primary">QuickView</a>
+              </div>
+            </div>
+            {% if forloop.counter|divisibleby:3 and not forloop.last %}
+              </div>
+              </div>
+              <div class="carousel-item" data-bs-interval="10000">
+                <div class="container d-flex justify-content-center">
+            {% endif %}
+          {% endfor %}
+        </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark{{forloop.counter}}"  data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark{{forloop.counter}}"  data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+  </div>
+</div>
+{% endfor %}
+
+<script>
+
+{% if msg != "" %}
+    alert("{{msg}}");
+    document.location = "/shop";
+{% endif %}
+
+let prod_title = document.getElementsByClassName("product-title");
+
+function shortProductTxt(MyElements, sliceTo){
+  for ( let MyElement of MyElements ){
+      if (MyElement.innerText.length > sliceTo ){
+          MyElement.innerText = MyElement.innerText.slice(0,sliceTo) + "....";
+      }
+  }
+}
+
+shortProductTxt(prod_title, 22);
+
+</script>
+{% endblock body %}
+
+

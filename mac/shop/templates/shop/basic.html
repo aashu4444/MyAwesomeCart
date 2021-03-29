@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+    <title>{% block title %}{% endblock title %}</title>
+  </head>
+  <body>
+  {% load static %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">My Awesome Cart</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="/shop">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/shop/about">About Us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/shop/tracker">Tracker</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/shop/contact">Contact Us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/blog">Blog</a>
+        </li>
+        
+      </ul>
+      
+      <form method="get" action="/shop/search/" class="d-flex">
+        <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search" id="query" required>
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+      <!-- <button class="btn btn-secondary ms-1" href="#">Cart(<span id="carts_num"></span>)</button> -->
+      <button type="button" data-bs-html="true" class="btn btn-secondary mx-2" id="popcart" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="Bottom popover asfasf afygrt tgfdgsfg vbcvb bfgfgd d">
+        Cart ( <span id="carts_num"></span> )
+      </button>
+    </div>
+  </div>
+</nav>
+    {% block body %}{% endblock body %}
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js" integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js" integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG" crossorigin="anonymous"></script>
+    -->
+    <script>
+    let carts_num = document.getElementById("carts_num");
+    const popcart = document.getElementById("popcart");
+    
+
+    // Init popvers
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl)
+    });
+    
+    var myDefaultAllowList = bootstrap.Tooltip.Default.allowList
+
+    // To allow table elements
+    myDefaultAllowList.button = ["onclick", "id", "class"]
+
+    function setCartNum(){
+      try{
+        let my_cart = localStorage.getItem("cart")
+        if(my_cart == undefined){
+          carts_num.innerText = "0";
+        }
+        else{
+          let myDict = JSON.parse(my_cart);
+          const CartArr = Object.values(myDict);
+          const mainCartArr = [];
+          Array.from(CartArr).forEach((element, index) => {
+            mainCartArr.push(element[0]);
+          });
+          let CartSum = mainCartArr.reduce((accum, currValue) => {
+            return accum + currValue;
+          });
+          
+          carts_num.innerText = CartSum;
+        }
+      }
+      catch{
+        carts_num.innerText = "0";
+      }
+    }
+
+    var cart = JSON.parse(localStorage.getItem("cart"));
+
+    setCartNum();
+
+    // add a class to nav-link according the url
+    let navLinks = document.getElementsByClassName("nav-link");
+    let currentLocation = document.location.href.split("/")[4];
+
+    if (currentLocation != ""){
+      for(let link of navLinks){
+        if (currentLocation != "" && link.innerText.toUpperCase().includes(currentLocation.toUpperCase())){
+          link.classList.add("active");
+        }
+      }
+    }
+    else{
+      navLinks[0].classList.add("active");
+    }
+
+
+    // Add active class to nav items
+    /*let items = document.getElementsByClassName("nav-item");
+
+    let main_arr = [];
+
+    let loc = document.location.href.split("/")[4];
+
+    for ( i of items){
+      main_arr.push(i.getElementsByTagName("a")[0]);
+    }
+
+    // document.getElementsByClassName(loc + "Link")[0].classList.add("active");
+    
+*/
+
+    </script>
+    {% block js %}{% endblock js %}
+  </body>
+</html>
